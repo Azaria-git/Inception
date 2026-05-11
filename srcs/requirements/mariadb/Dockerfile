@@ -1,16 +1,17 @@
-FROM debian:bullseye
+FROM debian:12.13-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     mariadb-server \
-    mariadb-client \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY conf/my.cnf /etc/mysql/my.cnf
-COPY tools/entrypoint.sh /entrypoint.sh
+RUN mkdir -p /var/run/mysqld \
+    && chown -R mysql:mysql /var/run/mysqld
 
-RUN chmod +x /entrypoint.sh
-RUN mkdir -p /run/mysqld && chown mysql:mysql /run/mysqld
+COPY tools/init-db.sh /init-db.sh
 
-EXPOSE 3306
+RUN chmod +x /init-db.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/init-db.sh"]
