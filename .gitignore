@@ -1,11 +1,1 @@
-# Secrets and credentials
-secrets/
-srcs/.env
-
-# Docker files
-*.log
-.DS_Store
-.git
-
-# Volume data
-/home/azaria/data
+*.env
