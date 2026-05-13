@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/run/mysqld \
-    && chown -R mysql:mysql /var/run/mysqld
+    && chown -R mysql:mysql /var/run/mysqld \
+    && chown -R mysql:mysql /var/lib/mysql
 
 COPY tools/init-db.sh /init-db.sh
 
