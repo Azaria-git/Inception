@@ -29,7 +29,7 @@ RUN wget https://wordpress.org/latest.tar.gz -O /tmp/wp.tar.gz && \
 RUN chown -R nobody:nobody /var/www/html
 
 # PHP-FPM config minimale
-COPY www.conf /etc/php82/php-fpm.d/www.conf
+COPY conf/www.conf /etc/php82/php-fpm.d/www.conf
 
 # Script de lancement
 COPY tools/setup.sh /setup.sh
