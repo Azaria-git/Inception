@@ -4,10 +4,20 @@ networks:
 
 # Définition des volumes nommés (stockage dans /home/login/data)
 volumes:
-  db_data:
-    name: db_data
-  wp_files:
-    name: wp_files
+  v_mariadb:
+    name: v_mariadb
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${LOGIN}/data/wordpress_db
+      o: bind
+  v_wp_files:
+    name: v_wp_files
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${LOGIN}/data/wordpress_files
+      o: bind
 
 # Services
 services:
@@ -17,15 +27,15 @@ services:
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
-    image: mariadb:custom
+    image: mariadb
     restart: unless-stopped  # Redémarrage en cas de crash
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
-      - db_data:/var/lib/mysql
+      - v_mariadb:/var/lib/mysql
     networks:
       - inception-network
     expose:
@@ -42,18 +52,18 @@ services:
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
-    image: wordpress:custom
+    image: wordpress
     restart: unless-stopped
     depends_on:
       mariadb:
         condition: service_healthy
     environment:
       WORDPRESS_DB_HOST: mariadb:3306
-      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
-      WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - wp_files:/var/www/html
+      - v_wp_files:/var/www/html
     networks:
       - inception-network
     expose:
@@ -65,14 +75,14 @@ services:
     build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
-    image: nginx:custom
+    image: nginx
     restart: unless-stopped
     depends_on:
       - wordpress
     ports:
       - "443:443"  # SEUL port exposé sur l'hôte
     volumes:
-      - wp_files:/var/www/html:ro  # Monte les fichiers WP en lecture seule
+      - v_wp_files:/var/www/html:ro  # Monte les fichiers WP en lecture seule
     networks:
       - inception-network
     environment:
@@ -100,7 +110,7 @@ services:
 #     image: ftp:custom
 #     restart: unless-stopped
 #     volumes:
-#       - wp_files:/home/vsftpd/user
+#       - v_wp_files:/home/vsftpd/user
 #     networks:
 #       - inception-network
 #     ports:

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# MARIADB_DATABASE
+# MARIADB_USER
+# MARIADB_PASSWORD
+# MARIADB_ROOT_PASSWORD
+
 # Start MariaDB temporarily
 mysqld_safe --user=mysql &
 
@@ -9,13 +14,13 @@ while ! mysqladmin ping --silent; do
 done
 
 # Create database
-mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+mysql -e "CREATE DATABASE IF NOT EXISTS ${MARIADB_DATABASE};"
 
 # Create user
-mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
+mysql -e "CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'%' IDENTIFIED BY '${MARIADB_PASSWORD}';"
 
 # Grant privileges
-mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+mysql -e "GRANT ALL PRIVILEGES ON ${MARIADB_DATABASE}.* TO '${MARIADB_USER}'@'%';"
 
 # Apply changes
 mysql -e "FLUSH PRIVILEGES;"
