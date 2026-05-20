@@ -55,8 +55,8 @@ up: build
 # run containers with logs
 up-logs: build
 	@echo "$(BLUE)Starting containers with logs...$(NC)"
-	mkdir -p $(DB_DATA_DIR)
-	mkdir -p $(WP_DATA_DIR)
+	@mkdir -p $(DB_DATA_DIR)
+	@mkdir -p $(WP_DATA_DIR)
 	@$(COMPOSE) $(ENV_OPTIONS) -f $(COMPOSE_FILE) up
 
 # stop containers
@@ -78,7 +78,7 @@ fclean: clean
 	@echo "$(GREEN)Images removed!$(NC)"
 
 # WARNING: This will delete ALL WordPress and database data!
-clean-data:
+clean-data: fclean
 	@echo "$(RED)WARNING: This will delete ALL WordPress and database data!$(NC)"
 	@read -p "Are you sure? (y/N): " confirm; \
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
@@ -89,6 +89,9 @@ clean-data:
 	else \
 		echo "$(YELLOW)Cancelled.$(NC)"; \
 	fi
+
+recover: clean-data up
+	@echo "$(GREEN)Data recovery complete!$(NC)"
 
 restart: down up
 	@echo "$(GREEN)Containers restarted!$(NC)"
@@ -118,7 +121,7 @@ help:
 	@echo "  status       Show container status"
 	@echo "  logs         Follow container logs"
 	@echo "  help         Show this help message"
-
+	@echo "  recover      Recover data (clean-data + up)"
 
 
 .PHONY: all check_env build up up-logs down clean fclean clean-all logs help

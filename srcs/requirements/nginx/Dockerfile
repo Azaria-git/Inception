@@ -9,6 +9,7 @@ COPY website/ /var/www/html/
 
 COPY --chmod=755 tools/generate_ssl.sh /tmp/generate_ssl.sh
 
+# run the SSL generation script and remove it afterwards
 RUN /tmp/generate_ssl.sh && \
     rm -f /tmp/generate_ssl.sh
 
